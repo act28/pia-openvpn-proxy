@@ -32,7 +32,7 @@ docker-compose up -d
 ```
 
 ### Environment Variables
-`REGION` is optional. The default region is set to `AU Sydney`. `REGION` should match the supported PIA `.opvn` region config. 
+`REGION` is optional. The default region is set to `US East`. `REGION` should match the supported PIA `.opvn` region config. 
 
 See the [PIA VPN Tunnel Network page](https://www.privateinternetaccess.com/pages/network/dkrpia) for details.
 Use the `Location` value for your `REGION`.
