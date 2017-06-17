@@ -1,0 +1,26 @@
+version: '3'
+services:
+  vpn_proxy:
+    image: act28/pia-openvpn-proxy
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    dns:
+      - 209.222.18.218
+      - 209.222.18.222
+    volumes:
+      - /etc/localtime:/etc/caltime:ro
+    environment:
+      - REGION=US East
+      - USERNAME=<username>
+      - PASSWORD=<password>
+      - LOCAL_NETWORK=10.1.1.0/24
+    networks:
+      - vpn_proxy
+    ports:
+      - 8080:8080
+    restart: always
+
+networks:
+  vpn_proxy:
