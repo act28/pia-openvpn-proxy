@@ -10,7 +10,7 @@ services:
       - 209.222.18.218
       - 209.222.18.222
     volumes:
-      - /etc/localtime:/etc/caltime:ro
+      - /etc/localtime:/etc/localtime:ro
     environment:
       - REGION=US East
       - USERNAME=<username>

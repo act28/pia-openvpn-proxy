@@ -16,7 +16,7 @@ docker run -d --device=/dev/net/tun --cap-add=NET_ADMIN \
     -e "USERNAME=<pia_username>" \
     -e "PASSWORD=<pia_password>" \
     -e "LOCAL_NETWORK=192.168.1.0/24" \
-    -v /etc/localtime:/etc/caltime:ro \
+    -v /etc/localtime:/etc/localtime:ro \
     -p 8080:8080 \
     act28/pia-openvpn-proxy
 ```
