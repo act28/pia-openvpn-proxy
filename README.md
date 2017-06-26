@@ -11,14 +11,19 @@ If you don't have one, you can [sign up here](https://www.privateinternetaccess.
 ## Starting the VPN Proxy
 
 ```Shell
-docker run -d --device=/dev/net/tun --cap-add=NET_ADMIN \
-    -e "REGION=<region>" \
-    -e "USERNAME=<pia_username>" \
-    -e "PASSWORD=<pia_password>" \
-    -e "LOCAL_NETWORK=192.168.1.0/24" \
-    -v /etc/localtime:/etc/localtime:ro \
-    -p 8080:8080 \
-    act28/pia-openvpn-proxy
+docker run -d \
+--cap-add=NET_ADMIN \
+--device=/dev/net/tun \
+--name=vpn_proxy \
+--dns=209.222.18.218 --dns=209.222.18.222 \
+--restart=always \
+-e "REGION=<region>" \
+-e "USERNAME=<pia_username>" \
+-e "PASSWORD=<pia_password>" \
+-e "LOCAL_NETWORK=192.168.1.0/24" \
+-v /etc/localtime:/etc/localtime:ro \
+-p 8118:8118 \
+act28/pia-openvpn-proxy 
 ```
 
 Substitute the environment variables for `REGION`, `USERNAME`, `PASSWORD`, `LOCAL_NETWORK` as indicated.

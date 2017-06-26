@@ -19,7 +19,7 @@ services:
     networks:
       - vpn_proxy
     ports:
-      - 8080:8080
+      - 8118:8118
     restart: always
 
 networks:
