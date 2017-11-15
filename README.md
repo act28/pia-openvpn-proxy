@@ -48,7 +48,7 @@ Use the `Location` value for your `REGION`.
 
 ## Connecting to the VPN Proxy
 
-To connect to the VPN Proxy, set your browser proxy to 0.0.0.0:8080.
+To connect to the VPN Proxy, set your browser proxy to 0.0.0.0:8118.
 
 If you're using Chrome, you may want to use [ProxySwitchyOmega](https://chrome.google.com/webstore/detail/proxy-switchyomega/padekgcemlokbadohgkifijomclgjgif)
 
