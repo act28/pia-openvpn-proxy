@@ -6,4 +6,4 @@ gw=$(ip route | awk '/default/ {print $3}')
 ip route add to ${LOCAL_NETWORK} via $gw dev eth0
 
 # start
-privoxy --no-daemon
+privoxy --no-daemon ./config
