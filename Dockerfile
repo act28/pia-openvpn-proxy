@@ -1,9 +1,9 @@
-FROM alpine:latest
+FROM alpine:3.11
 MAINTAINER Ignatius Teo <ignatius.teo@gmail.com>
 
-EXPOSE 8080
+EXPOSE 8118
 
-RUN apk --update --no-cache add privoxy openvpn runit
+RUN apk update && apk add privoxy openvpn runit
 
 COPY app /app
 
