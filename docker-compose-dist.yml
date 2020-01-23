@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   vpn_proxy:
     image: act28/pia-openvpn-proxy
@@ -11,10 +11,13 @@ services:
       - 209.222.18.222
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      - </path/on/host>:/config
     environment:
       - REGION=US East
       - USERNAME=<username>
       - PASSWORD=<password>
+      - UID=<uid>
+      - GID=<gid>
       - LOCAL_NETWORK=10.1.1.0/24
     networks:
       - vpn_proxy

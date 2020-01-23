@@ -1,4 +1,4 @@
-confdir /app/privoxy
+confdir /config/privoxy
 
 listen-address  0.0.0.0:8118
 

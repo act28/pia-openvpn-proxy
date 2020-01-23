@@ -1,12 +1,27 @@
 #!/bin/sh
 set -e -u -o pipefail
 
-cd /app/ovpn/config/pia
+if [ -z "$UID" -o -z "$GID" ]; then
+    echo "UID and GID are not set."
+    exit 1
+fi
+
+[ ! -d /app/ovpn/config ] && mkdir -p /app/ovpn/config
+# download and install the latest default recommended ovpn configs
+wget -q https://www.privateinternetaccess.com/openvpn/openvpn-strong.zip
+unzip -uq openvpn-strong.zip -d /app/ovpn/config
+rm -f openvpn-strong.zip
+
+# copy configs to user mount
+mkdir -p /config/pia
+cp -u `pwd`/config/* /config/pia/
+
+chown -R "$UID:$GID" /config
 
 if [ -n "$REGION" ]; then
-  set -- "$@" '--config' "${REGION}.ovpn"
+  set -- "$@" '--config' "/config/pia/${REGION}.ovpn"
 else
-  echo "No OpenVPN config found in `pwd`/${REGION}.ovpn. Exiting."
+  echo "No OpenVPN config found in /config/pia/${REGION}.ovpn. Exiting."
   exit 1
 fi
 

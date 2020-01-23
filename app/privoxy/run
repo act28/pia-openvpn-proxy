@@ -1,4 +1,5 @@
 #!/bin/sh
+mkdir -p /config/privoxy
 sleep 10
 
 # so return traffic that went through VPN works
