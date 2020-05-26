@@ -10,8 +10,7 @@ RUN apk --no-cache add unzip=~6.0-r6
 COPY app /app
 COPY etc /etc
 
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
-RUN find /app -name run -print0 | xargs -0 chmod u+x
+RUN find /app -name "run" -exec chmod u+x {} \;
 
 ENV REGION="US East" \
     USERNAME="" \
