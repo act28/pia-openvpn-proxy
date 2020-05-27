@@ -1,6 +1,5 @@
-[![logo](https://www.privateinternetaccess.com/assets/PIALogo2x-09ca10950967bd3be87a5ef7730a69e07892d519cfc8f15228bec0a4f6102cc1.png)](https://www.privateinternetaccess.com/pages/network/dkrpia)
-
 # Privoxy via Private Internet Access OpenVPN
+
 An Alpine Linux container running Privoxy and OpenVPN via Private Internet Access
 
 Protect your browsing activities through an encrypted and anonymized VPN proxy!
@@ -42,6 +41,7 @@ docker-compose up -d
 ```
 
 ### Environment Variables
+
 `REGION` is optional. The default region is set to `US East`. `REGION` should match the supported PIA `.opvn` region config.
 
 See the [PIA VPN Tunnel Network page](https://www.privateinternetaccess.com/pages/network/dkrpia) for details.
