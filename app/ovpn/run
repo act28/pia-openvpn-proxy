@@ -1,11 +1,6 @@
 #!/bin/sh
 set -e -u -o pipefail
 
-if [ -z "$UID" -o -z "$GID" ]; then
-    echo "UID and GID are not set."
-    exit 1
-fi
-
 [ ! -d /app/ovpn/config ] && mkdir -p /app/ovpn/config
 # download and install the latest default recommended ovpn configs
 wget -q https://www.privateinternetaccess.com/openvpn/openvpn-strong.zip
@@ -14,9 +9,11 @@ rm -f openvpn-strong.zip
 
 # copy configs to user mount
 mkdir -p /config/pia
-cp -u `pwd`/config/* /config/pia/
+cp -u /app/ovpn/config/* /config/pia/
 
-chown -R "$UID:$GID" /config
+if [ -n "$UID" -a -n "$GID" ]; then
+  chown -R "$UID:$GID" /config
+fi
 
 if [ -n "$REGION" ]; then
   set -- "$@" '--config' "/config/pia/${REGION}.ovpn"
@@ -29,6 +26,7 @@ if [ -n "$USERNAME" -a -n "$PASSWORD" ]; then
   echo "$USERNAME" > auth.conf
   echo "$PASSWORD" >> auth.conf
   chmod 600 auth.conf
+  set -- "$@" '--auth-nocache'
   set -- "$@" '--auth-user-pass' 'auth.conf'
 else
   echo "OpenVPN credentials not set. Exiting."

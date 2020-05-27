@@ -1,0 +1,30 @@
+confdir /etc/privoxy
+
+actionsfile match-all.action # Actions that are applied to all sites and maybe overruled later on.
+actionsfile default.action   # Main actions file
+actionsfile user.action   # User actions file
+
+filterfile default.filter
+filterfile user.filter
+
+hostname vpn-proxy.lan
+listen-address 0.0.0.0:8118
+
+toggle  1
+enable-remote-toggle  1
+enable-remote-http-toggle  0
+enable-edit-actions 1
+enforce-blocks 0
+buffer-limit 4096
+enable-proxy-authentication-forwarding 0
+forwarded-connect-retries  0
+accept-intercepted-requests 0
+allow-cgi-request-crunching 0
+split-large-forms 0
+keep-alive-timeout 300
+socket-timeout 3
+
+debug   1    # show each GET/POST/CONNECT request
+debug   1024 # show failed requests
+debug   4096 # startup banner and warnings
+debug   8192 # non-fatal errors

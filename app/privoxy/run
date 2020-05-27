@@ -1,10 +1,18 @@
 #!/bin/sh
-mkdir -p /config/privoxy
+set -e -u -o pipefail
 sleep 10
+
+mkdir -p /config/privoxy
+cp -Ru /etc/privoxy/* /config/privoxy/
+sed -i "s|confdir[[:blank:]]/etc/|confdir /config/|" /config/privoxy/config
+
+if [ -n "$UID" -a -n "$GID" ]; then
+    chown -R "$UID:$GID" /config
+fi
 
 # so return traffic that went through VPN works
 gw=$(ip route | awk '/default/ {print $3}')
 ip route add to ${LOCAL_NETWORK} via $gw dev eth0
 
 # start
-privoxy --no-daemon ./config
+privoxy --no-daemon /config/privoxy/config
