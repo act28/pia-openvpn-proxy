@@ -11,7 +11,7 @@ CONTAINER_INSTANCE ?= default
 OPTS ?= \
 --cap-add=NET_ADMIN \
 --device=/dev/net/tun \
---dns=209.222.18.218 --dns=209.222.18.222 \
+--dns=209.222.18.218 --dns=209.222.18.222 --dns=1.1.1.1 --dns=1.0.0.1 --dns=9.9.9.9 --dns=205.204.88.60 \
 --restart=always
 
 .PHONY: build push shell run start stop rm release
@@ -36,6 +36,9 @@ stop:
 
 rm:
 	docker rm $(CONTAINER_NAME)-$(CONTAINER_INSTANCE)
+
+test:
+	docker run --rm --network=container:$(CONTAINER_NAME)-$(CONTAINER_INSTANCE) appropriate/curl -s ipecho.net/plain
 
 release: build
 	make push -e VERSION=$(VERSION)

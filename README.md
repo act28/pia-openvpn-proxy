@@ -1,5 +1,18 @@
 # Privoxy via Private Internet Access OpenVPN
 
+> **Note:**
+>
+> PIA's Legacy VPN Network will no longer be available after 31st Oct
+> 2020.
+>
+> The latest docker build now supports PIA's NextGen VPN network.
+> Wireguard is currently NOT supported, but will be as soon as it is
+> available in the Alpine Linux repositories.
+>
+> Read the PIA [Legacy VPN Network Sunset
+> Announcement](https://www.privateinternetaccess.com/blog/private-internet-access-legacy-vpn-network-sunset-announcement-30-september)
+> for more info.
+
 An Alpine Linux container running Privoxy and OpenVPN via Private Internet Access
 
 Protect your browsing activities through an encrypted and anonymized VPN proxy!

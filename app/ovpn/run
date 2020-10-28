@@ -3,9 +3,9 @@ set -e -u -o pipefail
 
 [ ! -d /app/ovpn/config ] && mkdir -p /app/ovpn/config
 # download and install the latest default recommended ovpn configs
-wget -q https://www.privateinternetaccess.com/openvpn/openvpn-strong.zip
-unzip -uq openvpn-strong.zip -d /app/ovpn/config
-rm -f openvpn-strong.zip
+wget -q https://www.privateinternetaccess.com/openvpn/openvpn-strong-tcp-nextgen.zip
+unzip -uoq openvpn-strong-tcp-nextgen.zip -d /app/ovpn/config
+rm -f openvpn-strong-tcp-nextgen.zip
 
 # copy configs to user mount
 mkdir -p /config/pia
