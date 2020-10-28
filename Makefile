@@ -4,7 +4,7 @@ include make_env
 NS ?= act28
 VERSION ?= latest
 
-IMAGE_NAME ?= pia-openvpn-privoxy
+IMAGE_NAME ?= pia-openvpn-proxy
 CONTAINER_NAME ?= vpn_proxy
 CONTAINER_INSTANCE ?= default
 
