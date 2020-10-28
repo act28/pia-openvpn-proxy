@@ -7,12 +7,14 @@ VERSION ?= latest
 IMAGE_NAME ?= pia-openvpn-privoxy
 CONTAINER_NAME ?= vpn_proxy
 CONTAINER_INSTANCE ?= default
+NETWORK ?= pia
 
 OPTS ?= \
 --cap-add=NET_ADMIN \
 --device=/dev/net/tun \
---dns=209.222.18.218 --dns=209.222.18.222 \
---restart=always
+--dns=209.222.18.218 --dns=209.222.18.222 --dns=1.1.1.1 --dns=1.0.0.1 --dns=9.9.9.9 --dns=205.204.88.60 \
+--restart=always \
+--network=$(NETWORK)
 
 .PHONY: build push shell run start stop rm release
 
@@ -29,6 +31,7 @@ run:
 	docker run --rm --name $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) $(OPTS) $(PORTS) $(VOLUMES) $(ENV) $(NS)/$(IMAGE_NAME):$(VERSION)
 
 start:
+	docker network create $(NETWORK) || true
 	docker run -d --name $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) $(OPTS) $(PORTS) $(VOLUMES) $(ENV) $(NS)/$(IMAGE_NAME):$(VERSION)
 
 stop:
@@ -36,6 +39,7 @@ stop:
 
 rm:
 	docker rm $(CONTAINER_NAME)-$(CONTAINER_INSTANCE)
+	docker network rm $(NETWORK) || true
 
 release: build
 	make push -e VERSION=$(VERSION)
