@@ -12,7 +12,7 @@ COPY etc /etc
 
 RUN find /app -name "run" -exec chmod u+x {} \;
 
-ENV REGION="US East" \
+ENV REGION="Switzerland" \
     USERNAME="" \
     PASSWORD="" \
     UID="" \
