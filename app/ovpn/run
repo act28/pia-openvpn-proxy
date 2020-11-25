@@ -1,11 +1,14 @@
 #!/bin/sh
 set -e -u -o pipefail
 
+# PIA might change config download URL, if that happens correct it here
+PIA_OVPN_CONFIG_URL='https://www.privateinternetaccess.com/openvpn/openvpn-strong-tcp.zip'
+
 [ ! -d /app/ovpn/config ] && mkdir -p /app/ovpn/config
 # download and install the latest default recommended ovpn configs
-wget -q https://www.privateinternetaccess.com/openvpn/openvpn-strong-tcp-nextgen.zip
-unzip -uoq openvpn-strong-tcp-nextgen.zip -d /app/ovpn/config
-rm -f openvpn-strong-tcp-nextgen.zip
+wget -q $PIA_OVPN_CONFIG_URL -O pia_ovpn_configs.zip || (echo "ERROR: Failed to download PIA configuration files, exitting" && exit 1)
+unzip -uoq pia_ovpn_configs.zip -d /app/ovpn/config
+rm -f pia_ovpn_configs.zip
 
 # copy configs to user mount
 mkdir -p /config/pia
@@ -16,9 +19,14 @@ if [ -n "$UID" -a -n "$GID" ]; then
 fi
 
 if [ -n "$REGION" ]; then
+  REGION=$(echo $REGION | sed 's/ /_/g' | tr '[:upper:]' '[:lower:]')
+  if [[ ! -f "/config/pia/${REGION}.ovpn" ]]; then
+    echo "ERROR: OpenVPN configuration profile not found, check your REGION environment variable, see https://www.privateinternetaccess.com/pages/network/dkrpia for possible choices" 
+    exit 1
+  fi
   set -- "$@" '--config' "/config/pia/${REGION}.ovpn"
 else
-  echo "No OpenVPN config found in /config/pia/${REGION}.ovpn. Exiting."
+  echo "REGION environment variable is not set. Exiting."
   exit 1
 fi
 
