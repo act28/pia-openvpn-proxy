@@ -20,6 +20,10 @@ fi
 
 if [ -n "$REGION" ]; then
   REGION=$(echo $REGION | sed 's/ /_/g' | tr '[:upper:]' '[:lower:]')
+  if [[ ! -f "/config/pia/${REGION}.ovpn" ]]; then
+    echo "ERROR: OpenVPN configuration profile not found, check your REGION environment variable, see https://www.privateinternetaccess.com/pages/network/dkrpia for possible choices" 
+    exit 1
+  fi
   set -- "$@" '--config' "/config/pia/${REGION}.ovpn"
 else
   echo "REGION environment variable is not set. Exiting."
