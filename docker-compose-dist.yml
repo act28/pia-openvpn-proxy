@@ -13,7 +13,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - </path/on/host>:/config
     environment:
-      - REGION=Switzerland
+      - REGION=switzerland
       - USERNAME=<username>
       - PASSWORD=<password>
       - UID=<uid>
