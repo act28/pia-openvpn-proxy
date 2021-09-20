@@ -41,4 +41,6 @@ else
   exit 1
 fi
 
+set -- "$@" '--data-ciphers' 'aes-256-cbc'
+
 openvpn "$@"
