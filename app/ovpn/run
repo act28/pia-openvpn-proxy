@@ -42,7 +42,8 @@ else
 fi
 
 # Add masquerade to use the container as a virtual router
-[[ "$MASQUERADE" == "true" ]] && /sbin/iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+setup_iptables_rule=${MASQUERADE:-}
+[[ "$setup_iptables_rule" == "true" ]] && /sbin/iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
 
 set -- "$@" '--data-ciphers' 'aes-256-cbc'
 
