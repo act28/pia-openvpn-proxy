@@ -66,6 +66,8 @@ Use the `Location` value for your `REGION`.
 
 `UID` / `GID` - Your UID/GID on your host machine.
 
+`MASQUERADE` - set to "true" to add masquerade rule for tun0 and use container as a router
+
 ## Connecting to the VPN Proxy
 
 To connect to the VPN Proxy, set your browser proxy to 127.0.0.1:8118 (or 0.0.0.0:8118 if that does not work). If you override the docker port `-p`, make sure to use that port number instead.
