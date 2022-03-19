@@ -41,6 +41,9 @@ else
   exit 1
 fi
 
+# Add masquerade to use the container as a virtual router
+[[ "$MASQUERADE" == "true" ]] && /sbin/iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+
 set -- "$@" '--data-ciphers' 'aes-256-cbc'
 
 openvpn "$@"
