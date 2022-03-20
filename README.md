@@ -2,23 +2,11 @@
 
 > **Note:**
 >
-> PIA's Legacy VPN Network will no longer be available after 31st Oct
-> 2020.
->
-> The latest docker build now supports PIA's NextGen VPN network.
-> Wireguard is currently NOT supported, but will be as soon as it is
-> available in the Alpine Linux repositories.
->
-> Read the PIA [Legacy VPN Network Sunset
-> Announcement](https://www.privateinternetaccess.com/blog/private-internet-access-legacy-vpn-network-sunset-announcement-30-september)
-> for more info.
+> Wireguard is currently NOT supported, but will be soon - when I have time.
 
 An Alpine Linux container running Privoxy and OpenVPN via Private Internet Access
 
 Protect your browsing activities through an encrypted and anonymized VPN proxy!
-
-You will need a [PrivateInternetAccess](https://www.privateinternetaccess.com/pages/how-it-works/dkrpia) account.
-If you don't have one, you can [sign up here](https://www.privateinternetaccess.com/pages/buy-vpn/dkrpia) for one.
 
 ## Starting the VPN Proxy
 
@@ -57,9 +45,6 @@ docker-compose up -d
 
 `REGION` is optional. The default region is set to `Switzerland`. `REGION` should match the supported PIA `.opvn` region config.
 
-See the [PIA VPN Tunnel Network page](https://www.privateinternetaccess.com/pages/network/dkrpia) for details.
-Use the `Location` value for your `REGION`.
-
 `USERNAME` / `PASSWORD` - Credentials to connect to PIA (different from your PIA customer login!)
 
 `LOCAL_NETWORK` - The CIDR mask of the local IP addresses (e.g. 192.168.1.0/24, 10.1.1.0/24) which will be accessing the proxy. This is so the response to a request can be returned to the client (i.e. your browser).
@@ -75,3 +60,7 @@ Alternatively, you can use the Proxy SwitchyOmega extension/addon as a convenien
 [Proxy SwitchyOmega for Chrome](https://chrome.google.com/webstore/detail/proxy-switchyomega/padekgcemlokbadohgkifijomclgjgif)
 
 [Proxy SwitchyOmega for Firefox](https://addons.mozilla.org/en-US/firefox/addon/switchyomega/)
+
+## Like this project?
+
+Consider signing up for a PIA plan thru my [affiliate link](https://www.privateinternetaccess.com/pages/buy-vpn/dkrpia).
