@@ -1,8 +1,9 @@
-version: "3"
+version: "3.8"
 services:
   vpn_proxy:
-    image: act28/pia-openvpn-proxy
+    image: docker.io/act28/pia-openvpn-proxy
     cap_add:
+      - MKNOD
       - NET_ADMIN
     devices:
       - /dev/net/tun
