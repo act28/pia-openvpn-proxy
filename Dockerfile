@@ -1,6 +1,6 @@
-FROM alpine:3.14
+FROM docker.io/alpine:3.15
 
-RUN apk --no-cache add ca-certificates=~20191127 \
+RUN apk --no-cache add ca-certificates=~20211220 \
     && apk --no-cache add privoxy=~3.0 \
     && apk --no-cache add openvpn=~2.5 \
     && apk --no-cache add runit=~2.1 \
