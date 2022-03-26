@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e -u -o pipefail
 
-if [ "$VPN_PROTOCOL" -ne "wireguard" ]; then
+if [ "$VPN_PROTOCOL" -eq "wireguard" ]; then
   exit 0
 fi
 
