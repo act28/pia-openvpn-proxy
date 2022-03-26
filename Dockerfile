@@ -5,14 +5,17 @@ RUN apk --no-cache add ca-certificates=~20211220 \
     && apk --no-cache add openvpn=~2.5 \
     && apk --no-cache add runit=~2.1 \
     && apk --no-cache add wget=~1.21 \
-    && apk --no-cache add unzip=~6.0
+    && apk --no-cache add unzip=~6.0 \
+    && apk --no-cache add wireguard-tools=~1.0 \
+    && apk --no-cache add jq=~1.6
 
 COPY app /app
 COPY etc /etc
 
 RUN find /app -name "run" -exec chmod u+x {} \;
 
-ENV REGION="switzerland" \
+ENV VPN_PROTOCOL="openvpn" \
+    REGION="switzerland" \
     USERNAME="" \
     PASSWORD="" \
     UID="" \
