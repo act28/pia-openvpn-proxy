@@ -10,7 +10,7 @@ PIA_OVPN_CONFIG_URL='https://www.privateinternetaccess.com/openvpn/openvpn-stron
 
 [ ! -d /app/ovpn/config ] && mkdir -p /app/ovpn/config
 # download and install the latest default recommended ovpn configs
-wget -q $PIA_OVPN_CONFIG_URL -O pia_ovpn_configs.zip || (echo "ERROR: Failed to download PIA configuration files, exiting" && exit 1)
+curl -s $PIA_OVPN_CONFIG_URL -o pia_ovpn_configs.zip || (echo "ERROR: Failed to download PIA configuration files, exiting" && exit 1)
 unzip -uoq pia_ovpn_configs.zip -d /app/ovpn/config
 rm -f pia_ovpn_configs.zip
 
