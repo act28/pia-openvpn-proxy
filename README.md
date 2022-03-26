@@ -19,6 +19,7 @@ docker run -d \
 --name=vpn_proxy \
 --dns=209.222.18.218 --dns=209.222.18.222 \
 --restart=always \
+-e "VPN_PROTOCOL=${VPN_PROTOCOL}" \
 -e "REGION=${REGION}" \
 -e "USERNAME=${USERNAME}}" \
 -e "PASSWORD=${PASSWORD}" \
@@ -31,8 +32,8 @@ docker run -d \
 docker.io/act28/pia-openvpn-proxy
 ```
 
-Substitute the environment variables for `REGION`, `USERNAME`, `PASSWORD`,
-`LOCAL_NETWORK`, `UID`, `GID` as indicated.
+Substitute the environment variables for `VPN_PROTOCOL`, `REGION`, `USERNAME`,
+`PASSWORD`, `LOCAL_NETWORK`, `UID`, `GID` as indicated.
 
 **NOTE** UID/GID refer to the user id and group id on your host machine. You can
 use `id -u <your username>` to find your UID, and `id -g <your username>` to
@@ -51,6 +52,8 @@ docker-compose up -d
 ```
 
 ## Environment Variables
+
+`VPN_PROTOCOL` defaults to `openvpn`. Alternatively, you can set this to `wireguard`.
 
 `REGION` is optional. The default region is set to `Switzerland`. `REGION`
 should match the supported PIA `.opvn` region config.
