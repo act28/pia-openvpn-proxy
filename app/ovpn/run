@@ -1,9 +1,7 @@
 #!/bin/sh
 set -e -u -o pipefail
 
-if [ "$VPN_PROTOCOL" -eq "wireguard" ]; then
-  exit 0
-fi
+[[ "$VPN_PROTOCOL" = "wireguard" ]] && exit 0
 
 # PIA might change config download URL, if that happens correct it here
 PIA_OVPN_CONFIG_URL='https://www.privateinternetaccess.com/openvpn/openvpn-strong-tcp.zip'

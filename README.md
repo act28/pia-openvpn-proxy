@@ -19,6 +19,7 @@ docker run -d \
 --name=vpn_proxy \
 --dns=209.222.18.218 --dns=209.222.18.222 \
 --restart=always \
+--privileged \ <-- required if using wireguard
 -e "VPN_PROTOCOL=${VPN_PROTOCOL}" \
 -e "REGION=${REGION}" \
 -e "USERNAME=${USERNAME}}" \

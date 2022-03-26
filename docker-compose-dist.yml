@@ -13,6 +13,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${VPN_PROXY_CONFIG}:/config
+    # if using wireguard, uncomment the next line
+    #privileged: true
     environment:
       - VPN_PROTOCOL=${VPN_PROTOCOL}
       - REGION=${REGION}

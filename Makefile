@@ -17,6 +17,9 @@ OPTS ?= \
 --cap-add=NET_ADMIN \
 --device=/dev/net/tun \
 --dns=209.222.18.218 --dns=209.222.18.222 --dns=1.1.1.1 --dns=1.0.0.1 --dns=9.9.9.9 --dns=205.204.88.60 \
+--privileged \
+
+#--privileged \
 
 .PHONY: shell run start stop rm release
 
