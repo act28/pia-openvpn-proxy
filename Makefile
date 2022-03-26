@@ -10,6 +10,7 @@ DOCKER_REPO := docker.io/act28/pia-openvpn-proxy
 
 CONTAINER_NAME ?= vpn_proxy
 CONTAINER_INSTANCE ?= default
+VPN_PROTOCOL ?= openvpn
 
 OPTS ?= \
 --cap-add=MKNOD \
