@@ -1,0 +1,101 @@
+#!/bin/sh
+set -e -u -o pipefail
+
+if [ "$VPN_PROTOCOL" -ne "wireguard" ]
+  exit 0
+fi
+
+rm -f /app/config/wgtoken
+
+# Retry login if no token is generated
+while :; do
+    # Get the token
+    tokenResponse=$(curl -s -u "$USERNAME:$PASSWORD" \
+    "https://www.privateinternetaccess.com/gtoken/generateToken")
+
+    if [[ $(echo "$tokenResponse" | jq -r '.status') != "OK" ]]; then
+        echo "ERROR: Authentication failed. PIA Username/Password is incorrect."
+        exit 1
+    fi
+
+    token=$(echo "$tokenResponse" | jq -r '.token')
+done
+
+# Get region data
+allRegions=$(curl -s https://serverlist.piaservers.net/vpninfo/servers/v6 | head -1)
+
+# Get the selected region
+regionData="$(echo "$allRegions" | jq --arg REGION_ID "$REGION" -r '.regions[] | select(.id==$REGION_ID)')"
+if [[ -z $regionData ]]; then
+    echo "REGION_ID `$REGION` is not valid."
+    exit 1
+fi
+
+WG_SERVER_IP=$(echo "$regionData" | jq -r '.servers.wg[0].ip')
+WG_HOSTNAME=$(echo "$regionData" | jq -r '.servers.wg[0].cn')
+
+# Create ephemeral wireguard keys.
+privKey=$(wg genkey)
+pubKey=$(echo "$privKey" | wg pubk
+
+echo "Connecting to PIA WireGuard API on $WG_SERVER_IP..."
+
+wireguard_json="$(curl -s -G \
+  --connect-to "$WG_HOSTNAME::$WG_SERVER_IP:" \
+  --cacert "ca.rsa.4096.crt" \
+  --data-urlencode "pt=${PIA_TOKEN}" \
+  --data-urlencode "pubkey=$pubKey" \
+  "https://${WG_HOSTNAME}:1337/addKey")"
+
+# Check if the API returned OK and stop this script if it didn't.
+if [[ $(echo "$wireguard_json" | jq -r '.status') != "OK" ]]; then
+  >&2 echo -e "${red}Server did not return OK. Stopping now.${nc}"
+  exit 1
+fi
+
+# Multi-hop is out of the scope of this repo, but you should be able to
+# get multi-hop running with both WireGuard and OpenVPN by playing with
+# these scripts. Feel free to fork the project and test it out.
+echo
+echo "Trying to disable a PIA WG connection in case it exists..."
+wg-quick down pia && echo -e "${green}\nPIA WG connection disabled!${nc}"
+echo
+
+# Create the WireGuard config based on the JSON received from the API
+# In case you want this section to also add the DNS setting, please
+# start the script with PIA_DNS=true.
+# This uses a PersistentKeepalive of 25 seconds to keep the NAT active
+# on firewalls. You can remove that line if your network does not
+# require it.
+if [[ $PIA_DNS == "true" ]]; then
+  dnsServer=$(echo "$wireguard_json" | jq -r '.dns_servers[0]')
+  echo "Trying to set up DNS to $dnsServer. In case you do not have resolvconf,"
+  echo "this operation will fail and you will not get a VPN. If you have issues,"
+  echo "start this script without PIA_DNS."
+  echo
+  dnsSettingForVPN="DNS = $dnsServer"
+fi
+echo -n "Trying to write /etc/wireguard/pia.conf..."
+mkdir -p /etc/wireguard
+
+cat << EOF > /etc/wireguard/pia.conf
+[Interface]
+Address = $(echo "$wireguard_json" | jq -r '.peer_ip')
+PrivateKey = $privKey
+$dnsSettingForVPN
+[Peer]
+PersistentKeepalive = 25
+PublicKey = $(echo "$wireguard_json" | jq -r '.server_key')
+AllowedIPs = 0.0.0.0/0
+Endpoint = ${WG_SERVER_IP}:$(echo "$wireguard_json" | jq -r '.server_port')
+EOF
+
+# Start the WireGuard interface.
+# If something failed, stop this script.
+# If you get DNS errors because you miss some packages,
+# just hardcode /etc/resolv.conf to "nameserver 10.0.0.242".
+echo
+echo "Trying to create the wireguard interface..."
+wg-quick up pia || exit 1
+echo
+echo -e "${green}The WireGuard interface got created.${nc}
