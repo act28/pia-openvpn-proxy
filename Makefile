@@ -27,7 +27,7 @@ shell:
 	@docker exec -it $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) /bin/sh
 
 start:
-	@docker run -d --name $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) $(OPTS) $(PORTS) $(VOLUMES) $(ENV) $(DOCKER_REPO):$(DOCKER_TAGS)
+	@docker run -d --restart=always --name $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) $(OPTS) $(PORTS) $(VOLUMES) $(ENV) $(DOCKER_REPO):$(DOCKER_TAGS)
 
 stop:
 	@docker stop $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) > /dev/null 2>&1 || true
