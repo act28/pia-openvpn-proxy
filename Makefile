@@ -10,20 +10,24 @@ DOCKER_REPO := docker.io/act28/pia-openvpn-proxy
 
 CONTAINER_NAME ?= vpn_proxy
 CONTAINER_INSTANCE ?= default
+VPN_PROTOCOL ?= openvpn
 
 OPTS ?= \
 --cap-add=MKNOD \
 --cap-add=NET_ADMIN \
 --device=/dev/net/tun \
 --dns=209.222.18.218 --dns=209.222.18.222 --dns=1.1.1.1 --dns=1.0.0.1 --dns=9.9.9.9 --dns=205.204.88.60 \
+--privileged \
+
+#--privileged \
 
 .PHONY: shell run start stop rm release
 
 shell:
-	docker exec -it $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) /bin/sh
+	@docker exec -it $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) /bin/sh
 
 start:
-	docker run -d --name $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) $(OPTS) $(PORTS) $(VOLUMES) $(ENV) $(DOCKER_REPO):$(DOCKER_TAGS)
+	@docker run -d --restart=always --name $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) $(OPTS) $(PORTS) $(VOLUMES) $(ENV) $(DOCKER_REPO):$(DOCKER_TAGS)
 
 stop:
 	@docker stop $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) > /dev/null 2>&1 || true

@@ -12,14 +12,17 @@ services:
       - 209.222.18.222
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - </path/on/host>:/config
+      - ${VPN_PROXY_CONFIG}:/config
+    # if using wireguard, uncomment the next line
+    #privileged: true
     environment:
-      - REGION=switzerland
-      - USERNAME=<username>
-      - PASSWORD=<password>
-      - UID=<uid>
-      - GID=<gid>
-      - LOCAL_NETWORK=10.1.1.0/24
+      - VPN_PROTOCOL=${VPN_PROTOCOL}
+      - REGION=${REGION}
+      - USERNAME=${PIA_USERNAME}
+      - PASSWORD=${PIA_PASSWORD}
+      - UID=${UID}
+      - GID=${GID}
+      - LOCAL_NETWORK=${LOCAL_NET}/24
     networks:
       - vpn_proxy
     ports:

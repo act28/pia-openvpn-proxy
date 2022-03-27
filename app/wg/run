@@ -1,0 +1,97 @@
+#!/bin/sh
+set -e -u -o pipefail
+
+[[ "$VPN_PROTOCOL" != "wireguard" ]] && exit 0
+
+if [[ -f "/app/wg/token" ]]; then
+  # Check if peer connected
+  hs=$(wg | sed -nr 's/latest handshake: ((([0-9]+ minute[s]?), )?([0-9]+ second[s]?)) ago/\3 \4/p')
+  [[ -n "$hs" ]] && exit 0
+  d=$(date -ud "1970-01-01 00:00:00 UTC $hs" "+%s")
+  # Check latest handshake is < 3 mins ago
+  [[ "$d" -le "300" ]] && exit 0
+fi
+
+echo "Removing existing token..."
+rm -f /app/wg/token
+
+# Get the token
+echo "Getting a token..."
+tokenResponse=$(curl -s -u "$USERNAME:$PASSWORD" \
+"https://www.privateinternetaccess.com/gtoken/generateToken")
+
+if [[ $(echo "$tokenResponse" | jq -r '.status') != "OK" ]]; then
+    echo "ERROR: Authentication failed. PIA Username/Password is incorrect."
+    exit 1
+fi
+
+token=$(echo "$tokenResponse" | jq -r '.token')
+echo "Token: $token"
+echo $token > /app/wg/token
+
+# Get region data
+echo "Fetching server info..."
+allRegions=$(curl -s https://serverlist.piaservers.net/vpninfo/servers/v6 | head -1)
+
+# Get the selected region
+echo "Getting configured region data..."
+regionData="$(echo "$allRegions" | jq --arg REGION_ID "$REGION" -r '.regions[] | select(.id==$REGION_ID)')"
+if [[ -z "$regionData" ]]; then
+    echo "REGION_ID `$REGION` is not valid."
+    exit 1
+fi
+
+WG_SERVER_IP=$(echo "$regionData" | jq -r '.servers.wg[0].ip')
+WG_HOSTNAME=$(echo "$regionData" | jq -r '.servers.wg[0].cn')
+
+# Create ephemeral wireguard keys.
+echo "Generating ephemeral keys..."
+privKey=$(wg genkey)
+pubKey=$(echo "$privKey" | wg pubkey)
+
+echo "Getting the PIA wireguard config..."
+wireguard_json="$(curl -s -G \
+  --connect-to "${WG_HOSTNAME}::${WG_SERVER_IP}:" \
+  --cacert "/etc/ssl/certs/ca.rsa.4096.crt" \
+  --data-urlencode "pt=$token" \
+  --data-urlencode "pubkey=$pubKey" \
+  "https://${WG_HOSTNAME}:1337/addKey")"
+
+# Check if the API returned OK and stop this script if it didn't.
+if [[ $(echo "$wireguard_json" | jq -r '.status') != "OK" ]]; then
+  >&2 echo "ERROR: Server did not return OK."
+  exit 1
+fi
+
+# Create the WireGuard config based on the JSON received from the API
+echo -n "Creating wireguard config..."
+mkdir -p /etc/wireguard
+
+cat <<- EOF > /etc/wireguard/pia.conf
+[Interface]
+Address = $(echo "$wireguard_json" | jq -r '.peer_ip')
+PrivateKey = $privKey
+DNS = $(echo "$wireguard_json" | jq -r '.dns_servers[0]')
+[Peer]
+# Keep the NAT active on firewalls
+PersistentKeepalive = 25
+PublicKey = $(echo "$wireguard_json" | jq -r '.server_key')
+AllowedIPs = 0.0.0.0/0
+Endpoint = ${WG_SERVER_IP}:$(echo "$wireguard_json" | jq -r '.server_port')
+EOF
+echo
+
+if [[ "$(wg | grep -cm1 'interface: pia')" -eq "1" ]]; then
+  echo "Disabling existing connections..."
+  wg-quick down pia && echo "done"
+fi
+
+# Start the WireGuard interface.
+#
+# If you get DNS errors just hardcode /etc/resolv.conf to "nameserver
+# 10.0.0.242".
+echo "Starting the wireguard interface..."
+wg-quick up pia || exit 1
+
+echo "Wireguard connected on $WG_SERVER_IP"
+exit 0
