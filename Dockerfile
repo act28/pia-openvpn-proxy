@@ -8,7 +8,8 @@ RUN apk --no-cache add ca-certificates=~20211220 \
     && apk --no-cache add unzip=~6.0 \
     && apk --no-cache add wireguard-tools=~1.0 \
     && apk --no-cache add jq=~1.6 \
-    && apk --no-cache add sudo=~1.9
+    && apk --no-cache add sudo=~1.9 \
+    && apk --no-cache add coreutils=~9.0
 
 COPY app /app
 COPY etc /etc
