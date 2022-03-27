@@ -84,8 +84,8 @@ data to find the `id` key of your preferred region.
 
 You can find the current region list [here](https://serverlist.piaservers.net/vpninfo/servers/v6).
 
-The open-source[PIA-manual-connection](https://github.com/pia-foss/manual-connections)
-scripts uses a latency check to determine the "best" region, which may not be
+The open-source [PIA manual-connection](https://github.com/pia-foss/manual-connections)
+script uses a latency check to determine the "best" region, which may not be
 ideal, in certain circumstances. I have chosen not to include a latency check
 at this time, but may consider it in another iteration.
 
