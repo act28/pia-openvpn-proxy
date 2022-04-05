@@ -79,7 +79,7 @@ request can be returned to the client (i.e. your browser).
 
 PIA's wireguard uses a JSON API request over HTTPS to configure and setup the
 tunnel connection. Unfortunately, neither the wireguard `REGION` ids, nor names,
-match the the OpenVPN regions. You will have to search through the returned JSON
+match the OpenVPN regions. You will have to search through the returned JSON
 data to find the `id` key of your preferred region.
 
 You can find the current region list [here](https://serverlist.piaservers.net/vpninfo/servers/v6).
