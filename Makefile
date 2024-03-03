@@ -1,11 +1,5 @@
 DOCKER_REPO := docker.io/act28/pia-openvpn-proxy
 
--include .makefiles/Makefile
--include .makefiles/pkg/docker/v1/Makefile
-
-.makefiles/%:
-	curl -sfL https://makefiles.dev/v1 | bash /dev/stdin "$@"
-
 -include make_env
 
 CONTAINER_NAME ?= vpn_proxy
@@ -19,15 +13,16 @@ OPTS ?= \
 --dns=209.222.18.218 --dns=209.222.18.222 --dns=1.1.1.1 --dns=1.0.0.1 --dns=9.9.9.9 --dns=205.204.88.60 \
 --privileged \
 
-#--privileged \
-
 .PHONY: shell run start stop rm release
 
 shell:
 	@docker exec -it $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) /bin/sh
 
+build:
+	@docker build -t $(DOCKER_REPO):$(VERSION) .
+
 start:
-	@docker run -d --restart=always --name $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) $(OPTS) $(PORTS) $(VOLUMES) $(ENV) $(DOCKER_REPO):$(DOCKER_TAGS)
+	@docker run -d --restart=always --name $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) $(OPTS) $(PORTS) $(VOLUMES) $(ENV) $(DOCKER_REPO):$(VERSION)
 
 stop:
 	@docker stop $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) > /dev/null 2>&1 || true
@@ -35,8 +30,12 @@ stop:
 rm: stop
 	@docker rm $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) > /dev/null 2>&1 || true
 
+builder:
+	@docker buildx create --name container --driver=docker-container container
+
 release:
-	DOCKER_TAGS=$(VERSION) make docker-push
+	@docker buildx build --builder=container --platform=linux/amd64,darwin/aarch64 -t $(DOCKER_REPO):$(VERSION)
+	;--push
 
 test::
 	docker run --rm --network=container:$(CONTAINER_NAME)-$(CONTAINER_INSTANCE) docker.io/appropriate/curl -s ipecho.net/plain
