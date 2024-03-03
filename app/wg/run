@@ -3,14 +3,7 @@ set -e -u -o pipefail
 
 [[ "$VPN_PROTOCOL" != "wireguard" ]] && exit 0
 
-if [[ -f "/app/wg/token" ]]; then
-  # Check if peer connected
-  hs=$(wg | sed -nr 's/latest handshake: ((([0-9]+ minute[s]?), )?([0-9]+ second[s]?)) ago/\3 \4/p')
-  [[ -n "$hs" ]] && exit 0
-  d=$(date -ud "1970-01-01 00:00:00 UTC $hs" "+%s")
-  # Check latest handshake is < 3 mins ago
-  [[ "$d" -le "300" ]] && exit 0
-fi
+[[ $(cat /sys/class/net/pia/carrier) = 1 ]] && exit 0
 
 echo "Removing existing token..."
 rm -f /app/wg/token
@@ -94,4 +87,3 @@ echo "Starting the wireguard interface..."
 wg-quick up pia || exit 1
 
 echo "Wireguard connected on $WG_SERVER_IP"
-exit 0

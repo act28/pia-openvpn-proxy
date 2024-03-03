@@ -3,6 +3,11 @@ set -e -u -o pipefail
 
 [[ "$VPN_PROTOCOL" = "wireguard" ]] && exit 0
 
+[[ $(cat /sys/class/net/tun0/carrier) = 1 ]] && exit 0
+
+ovpn_pid=$(pidof openvpn)
+[[ -n $ovpn_pid ]] kill $ovpn_pid
+
 # PIA might change config download URL, if that happens correct it here
 PIA_OVPN_CONFIG_URL='https://www.privateinternetaccess.com/openvpn/openvpn-strong-tcp.zip'
 
