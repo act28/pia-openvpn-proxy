@@ -13,7 +13,7 @@ OPTS ?= \
 --dns=209.222.18.218 --dns=209.222.18.222 --dns=1.1.1.1 --dns=1.0.0.1 --dns=9.9.9.9 --dns=205.204.88.60 \
 --privileged \
 
-.PHONY: shell run start stop rm release
+.PHONY: shell build builder start stop rm release test
 
 shell:
 	@docker exec -it $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) /bin/sh
@@ -31,11 +31,10 @@ rm: stop
 	@docker rm $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) > /dev/null 2>&1 || true
 
 builder:
-	@docker buildx create --name container --driver=docker-container container
+	@docker buildx create --name container --driver=docker-container
 
 release:
-	@docker buildx build --builder=container --platform=linux/amd64,darwin/aarch64 -t $(DOCKER_REPO):$(VERSION)
-	;--push
+	@docker buildx build --builder=container --platform=linux/amd64,darwin/aarch64 -t $(DOCKER_REPO):$(VERSION) --push .
 
 test::
 	docker run --rm --network=container:$(CONTAINER_NAME)-$(CONTAINER_INSTANCE) docker.io/appropriate/curl -s ipecho.net/plain
