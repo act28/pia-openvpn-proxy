@@ -34,7 +34,7 @@ builder:
 	@docker buildx create --name container --driver=docker-container
 
 release:
-	@docker buildx build --builder=container --platform=linux/amd64,darwin/aarch64 -t $(DOCKER_REPO):$(VERSION) --push .
+	@docker buildx build --builder=container --platform=linux/amd64,linux/arm64 -t $(DOCKER_REPO):$(VERSION) --push .
 
 test::
 	docker run --rm --network=container:$(CONTAINER_NAME)-$(CONTAINER_INSTANCE) docker.io/appropriate/curl -s ipecho.net/plain
