@@ -1,12 +1,9 @@
 #!/bin/sh
 set -e -u -o pipefail
 
-[[ "$VPN_PROTOCOL" = "wireguard" ]] && exit 0
+[[ "$VPN_PROTOCOL" != "openvpn" ]] && exit 0
 
-[[ "$(cat /sys/class/net/pia/carrier 2>/dev/null)" = "1" ]] && exit 0
-
-ovpn_pid=$(pidof openvpn)
-[[ -n $ovpn_pid ]] kill $ovpn_pid
+[[ "$(cat /sys/class/net/tun0/carrier 2>/dev/null)" = "1" ]] && exit 0
 
 # PIA might change config download URL, if that happens correct it here
 PIA_OVPN_CONFIG_URL='https://www.privateinternetaccess.com/openvpn/openvpn-strong-tcp.zip'
@@ -15,11 +12,11 @@ PIA_OVPN_CONFIG_URL='https://www.privateinternetaccess.com/openvpn/openvpn-stron
 # download and install the latest default recommended ovpn configs
 curl -s $PIA_OVPN_CONFIG_URL -o pia_ovpn_configs.zip || (echo "ERROR: Failed to download PIA configuration files, exiting" && exit 1)
 unzip -uoq pia_ovpn_configs.zip -d /app/ovpn/config
-rm -f pia_ovpn_configs.zip
 
 # copy configs to user mount
 mkdir -p /config/pia
-cp -u /app/ovpn/config/* /config/pia/
+cp -u /app/ovpn/config/*.ovpn /config/pia/
+rm -f /app/ovpn/config/*
 
 if [ -n "$UID" -a -n "$GID" ]; then
   chown -R "$UID:$GID" /config
