@@ -19,7 +19,8 @@ COPY app/wg /app/wg
 COPY app/privoxy /app/privoxy
 COPY etc /etc
 
-RUN find /app -name "run" -exec chmod u+x {} \;
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN find /app -type f -print0 | xargs -r0 chmod +x
 
 ENV VPN_PROTOCOL="openvpn" \
     REGION="switzerland" \

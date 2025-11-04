@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e -u -o pipefail
+
+if [ "$VPN_PROTOCOL" = "openvpn" ]; then
+    VPN_PROTOCOL="openvpn_udp_strong"
+fi
+
+sudo \
+    VPN_PROTOCOL=${VPN_PROTOCOL} \
+    PREFERRED_REGION=${REGION} \
+    DISABLE_IPV6=yes \
+    DIP_TOKEN=no \
+    PIA_PF=false \
+    PIA_DNS=true \
+    PIA_USER=${USERNAME} \
+    PIA_PASS=${PASSWORD}} \
+    ./run_setup.sh
