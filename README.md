@@ -95,15 +95,13 @@ To connect to the VPN Proxy, set your browser proxy to 127.0.0.1:8118 (or
 0.0.0.0:8118 if that does not work). If you override the docker port `-p`, make
 sure to use that port number instead.
 
-Alternatively, you can use the Proxy SwitchyOmega extension/addon as a
+Alternatively, you can use the Proxy SwitchyOmega 3 extension/addon as a
 convenience.
 
-[Proxy SwitchyOmega for
-Chrome](https://chrome.google.com/webstore/detail/proxy-switchyomega/padekgcemlokbadohgkifijomclgjgif)
+[Proxy SwitchyOmega 3 (ZeroOmega) for Chrome](https://chromewebstore.google.com/detail/proxy-switchyomega-3-zero/pfnededegaaopdmhkdmcofjmoldfiped)
 
-[Proxy SwitchyOmega for
-Firefox](https://addons.mozilla.org/en-US/firefox/addon/switchyomega/)
+[Proxy SwitchyOmega 3 (ZeroOmega) for FireFox](https://addons.mozilla.org/en-US/firefox/addon/zeroomega/)
 
 ## Like this project?
 
-Please consider signing up for a PIA plan thru my [affiliate link](https://www.privateinternetaccess.com/pages/buy-vpn/dkrpia).
+<iframe src="https://trocador.app/anonpay/?ticker_to=btc&network_to=Lightning&address=bc1qv8n70d4nu02j4aehwpaw47dguphdwv303hqdls&donation=True&simple_mode=True&amount=0.0001&name=act28&description=Docker+Hub+Donation&ticker_from=btc&network_from=Lightning&bgcolor=00000000" width="310" height="350" style="border:0" scrolling="no"></iframe> 
