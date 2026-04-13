@@ -1,22 +1,25 @@
 FROM alpine:3.22
+# Keeping on 3.22 for now.
+# See https://github.com/NetworkConfiguration/openresolv/issues/45#issuecomment-3706077699
+# for rationale
 
 RUN apk --no-cache add ca-certificates=~20250911-r0 \
-    && apk --no-cache add privoxy=~3.0 \
-    && apk --no-cache add openvpn=~2.6 \
-    && apk --no-cache add runit=~2.2 \
     && apk --no-cache add curl=~8.14 \
-    && apk --no-cache add unzip=~6.0 \
-    && apk --no-cache add wireguard-tools=~1.0 \
+    && apk --no-cache add dante-server=~1.4 \
+    && apk --no-cache add iptables=~1.8 \
     && apk --no-cache add jq=~1.8 \
+    && apk --no-cache add openvpn=~2.6 \
+    && apk --no-cache add privoxy=~3.0 \
+    && apk --no-cache add runit=~2.2 \
     && apk --no-cache add sudo=~1.9 \
-    && apk --no-cache add coreutils=~9.7 \
-    && apk --no-cache add ncurses=~6.5 \
-    && apk --no-cache add bash=~5.2 \
-    && apk --no-cache add iptables=~1.8
+    && apk --no-cache add unzip=~6.0 \
+    && apk --no-cache add wireguard-tools=~1.0
 
 COPY app/ovpn /app/ovpn
 COPY app/wg /app/wg
 COPY app/privoxy /app/privoxy
+COPY app/socks /app/socks
+COPY app/lib /opt/pia/lib
 COPY etc /etc
 
 RUN find /app -name "run" -exec chmod u+x {} \;
@@ -29,6 +32,8 @@ ENV VPN_PROTOCOL="openvpn" \
     GID="" \
     LOCAL_NETWORK=192.168.1.0/24
 
+EXPOSE 1080/tcp
+EXPOSE 1080/udp
 EXPOSE 8118
 VOLUME /config
 

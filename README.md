@@ -1,27 +1,25 @@
-# Privoxy via Private Internet Access OpenVPN
+# Privoxy via Private Internet Access OpenVPN/WireGuard
 
-> **Announcement:**
->
-> Wireguard is now supported!
-
-An Alpine Linux container running Privoxy and OpenVPN via Private Internet
+An Alpine Linux container running Privoxy and OpenVPN/WireGuard via Private Internet
 Access
 
 ## Starting the VPN Proxy
 
 ### Using `docker run`
 
+#### OpenVPN Example
+
 ```Shell
 docker run -d \
 --cap-add=MKNOD \
 --cap-add=NET_ADMIN \
+--cap-add=NET_RAW \
 --device=/dev/net/tun \
 --name=vpn_proxy \
 --dns=209.222.18.218 --dns=209.222.18.222 \
 --restart=always \
---privileged \
--e "VPN_PROTOCOL=${VPN_PROTOCOL}" \
--e "REGION=${REGION}" \
+-e "VPN_PROTOCOL=openvpn" \
+-e "REGION=switzerland" \
 -e "USERNAME=${USERNAME}" \
 -e "PASSWORD=${PASSWORD}" \
 -e "LOCAL_NETWORK=192.168.1.0/24" \
@@ -30,19 +28,38 @@ docker run -d \
 -v /etc/localtime:/etc/localtime:ro \
 -v </host/path/to/config>:/config \
 -p 8118:8118 \
+-p 1080:1080 \
+docker.io/act28/pia-openvpn-proxy
+```
+
+#### WireGuard Example
+
+```Shell
+docker run -d \
+--cap-add=NET_ADMIN \
+--cap-add=NET_RAW \
+--sysctl="net.ipv4.conf.all.src_valid_mark=1" \
+--privileged=true \
+--name=vpn_proxy \
+--dns=209.222.18.218 --dns=209.222.18.222 \
+--restart=always \
+-e "VPN_PROTOCOL=wireguard" \
+-e "REGION=swiss" \
+-e "USERNAME=${USERNAME}" \
+-e "PASSWORD=${PASSWORD}" \
+-e "LOCAL_NETWORK=192.168.1.0/24" \
+-e "UID=1000" \
+-e "GID=1000" \
+-v /etc/localtime:/etc/localtime:ro \
+-v </host/path/to/config>:/config \
+-p 8118:8118 \
+-p 1080:1080 \
 docker.io/act28/pia-openvpn-proxy
 ```
 
 **NOTE**
-The `--privileged` flag is only required for `wireguard`. You can omit it if
-using `openvpn`.
-
 Substitute the environment variables for `VPN_PROTOCOL`, `REGION`, `USERNAME`,
 `PASSWORD`, `LOCAL_NETWORK`, `UID`, `GID` as indicated.
-
-**NOTE** UID/GID refer to the user id and group id on your host machine. You can
-use `id -u <your username>` to find your UID, and `id -g <your username>` to
-find your GID.
 
 ### Using `docker-compose`
 
@@ -58,28 +75,22 @@ docker-compose up -d
 
 ## Environment Variables
 
-`VPN_PROTOCOL` defaults to `openvpn`. Alternatively, you can set this to
-`wireguard`.
-
-`REGION` is optional (for `openvpn`). The default region is set to
-`switzerland`. `REGION` should match the supported PIA `.opvn` region config.
-**Note**: The PIA Wireguard `REGION` is _different_. See the [Wireguard](#wireguard)
-section below for more information.
-
-`USERNAME` / `PASSWORD` - Credentials to connect to PIA (different from your PIA
-customer login!)
-
-`LOCAL_NETWORK` - The CIDR mask of the local IP addresses (e.g. 192.168.1.0/24,
-10.1.1.0/24) which will be accessing the proxy. This is so the response to a
-request can be returned to the client (i.e. your browser).
-
-`UID` / `GID` - Your UID/GID on your host machine.
+|----------------|-------------|
+| Variable Name | Description |
+|----------------|-------------|
+| `VPN_PROTOCOL` | `wireguard` or `openvpn` (Default: `openvpn`) |
+| `REGION` | Default (OpenVPN): `switzerland`. See [Wireguard](#wireguard) section below for more information. |
+| `USERNAME` | Your PIA Username |
+| `PASSWORD` | Your PIA Password |
+| `LOCAL_NETWORK` | The CIDR mask of your local IP addresses (e.g. 192.168.1.0/24,
+10.1.1.0/24). |
+| `UID` | Use `id -u $USER` to find your UID |
+| `GID` | Use `id -g $USER` to find your GID. |
 
 ## Wireguard
 
 PIA's wireguard uses a JSON API request over HTTPS to configure and setup the
-tunnel connection. Unfortunately, neither the wireguard `REGION` ids, nor names,
-match the OpenVPN regions. You will have to search through the returned JSON
+tunnel connection. You will have to search through the returned JSON
 data to find the `id` key of your preferred region.
 
 You can find the current region list [here](https://serverlist.piaservers.net/vpninfo/servers/v6).
@@ -95,14 +106,17 @@ To connect to the VPN Proxy, set your browser proxy to 127.0.0.1:8118 (or
 0.0.0.0:8118 if that does not work). If you override the docker port `-p`, make
 sure to use that port number instead.
 
-Alternatively, you can use the Proxy SwitchyOmega 3 extension/addon as a
-convenience.
+Alternatively, you can use the ZeroOmega extension/addon as a convenience.
 
 [Proxy SwitchyOmega 3 (ZeroOmega) for Chrome](https://chromewebstore.google.com/detail/proxy-switchyomega-3-zero/pfnededegaaopdmhkdmcofjmoldfiped)
+[ZeroOmega--Proxy SwitchyOmega V3 for FireFox](https://addons.mozilla.org/en-US/firefox/addon/zeroomega/)
 
-[Proxy SwitchyOmega 3 (ZeroOmega) for FireFox](https://addons.mozilla.org/en-US/firefox/addon/zeroomega/)
+## SOCKS5 Proxy
 
-## Like this project?
+A SOCKS5 proxy has been provided to support tcp/udp routing through the VPN tunnel.
+Use 127.0.0.1:1080 (or 0.0.0.0:1080)
+
+## Like this project? Help support it.
 
 [Donate](https://trocador.app/anonpay/?ticker_to=btc&network_to=Lightning&address=bc1qv8n70d4nu02j4aehwpaw47dguphdwv303hqdls&donation=True&simple_mode=True&amount=0.0001&name=act28&description=Docker+Hub+Donation&ticker_from=btc&network_from=Lightning&bgcolor=00000000)
 

@@ -1,0 +1,31 @@
+# Docker image version.
+# If you are building and testing locally, you can
+# append "-dev" to indicate a local dev version.
+VERSION=2.2.0
+
+# Docker container name.
+CONTAINER_NAME=vpn-proxy
+
+# Docker container instance (appended to container name).
+# This is used to distinguish containers with the same name.
+# You can use this to indicate the VPN destination country if you're
+# running different vpn containers.
+CONTAINER_INSTANCE=default
+
+VPN_PROTOCOL=openvpn
+REGION=switzerland
+
+# Local host ports.
+HTTP_PORT=8118
+SOCKS_PORT=1080
+
+# Local volume mount where your config files will be stored.
+CONFIG_PATH=/path/to/your/local/config
+
+# Local network.
+LOCAL_NETWORK=192.168.1.0/24
+
+# PIA credentials. Recommend setting these in
+# environment variables or an `.env` file.
+USERNAME=$(PIA_USERNAME)
+PASSWORD=$(PIA_PASSWORD)
