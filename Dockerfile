@@ -1,4 +1,4 @@
-FROM alpine:3.22
+FROM alpine:3.23
 # Keeping on 3.22 for now.
 # See https://github.com/NetworkConfiguration/openresolv/issues/45#issuecomment-3706077699
 # for rationale
