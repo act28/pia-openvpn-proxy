@@ -1,3 +1,10 @@
 .git
-docker-compose.yml
+.github
+*.md
+!README.md
+docker-compose*.yml
 run.sh
+make_env*
+*.log
+*.example
+tests/

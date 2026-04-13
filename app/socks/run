@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Load common VPN interface detection logic
+. /opt/pia/lib/vpn-interface.sh
+
+# Do not start SOCKS if VPN interface is not up
+ip link show "$VPN_INTERFACE" >/dev/null 2>&1 || exit 0
+
+# Check if port 1080 is already in use
+ss -tlnp 2>/dev/null | grep -q ":1080 " && exit 0
+
+# Dynamically create sockd configuration
+cat > /tmp/sockd.conf << EOF
+logoutput: stderr
+
+internal: 0.0.0.0 port = 1080
+external: ${VPN_INTERFACE}
+external.rotation: route
+
+user.notprivileged: nobody
+socksmethod: none
+clientmethod: none
+
+client pass {
+	from: 0.0.0.0/0 to: 0.0.0.0/0
+	log: error
+}
+
+socks pass {
+	from: 0.0.0.0/0 to: 0.0.0.0/0
+	protocol: tcp udp
+}
+EOF
+
+echo "Starting SOCKS daemon"
+sockd -N 2 -D -f /tmp/sockd.conf

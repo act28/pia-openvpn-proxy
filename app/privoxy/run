@@ -1,10 +1,17 @@
 #!/bin/sh
 set -e -u -o pipefail
-sleep 10
+
+# Load common VPN interface detection logic
+. /opt/pia/lib/vpn-interface.sh
+
+# Do not start Privoxy if VPN interface is not up
+ip link show "$VPN_INTERFACE" >/dev/null 2>&1 || exit 0
 
 mkdir -p /config/privoxy
 cp -Ru /etc/privoxy/* /config/privoxy/
 sed -i "s|confdir[[:blank:]]/etc/|confdir /config/|" /config/privoxy/config
+# SEC: Disable logfile
+sed -i 's|^logfile|#logfile|' /config/privoxy/config
 
 if [ -n "$UID" -a -n "$GID" ]; then
     chown -R "$UID:$GID" /config
@@ -15,4 +22,5 @@ gw=$(ip route | awk '/default/ {print $3}')
 ip route add to ${LOCAL_NETWORK} via $gw dev eth0
 
 # start
+echo "Starting Privoxy..."
 privoxy --no-daemon /config/privoxy/config

@@ -1,19 +1,23 @@
-version: "3.8"
 services:
   vpn_proxy:
     image: docker.io/act28/pia-openvpn-proxy
+    cap_drop:
+      - ALL
     cap_add:
-      - MKNOD
-      - NET_ADMIN
+      - MKNOD # Required by OVPN only to create tun0 node
+      - NET_ADMIN # Required by OVPN & WG for network config
+      - NET_RAW # Required for raw sockets
     devices:
-      - /dev/net/tun
+      - /dev/net/tun # Only for OVPN
     dns:
       - 209.222.18.218
       - 209.222.18.222
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${VPN_PROXY_CONFIG}:/config
-    # if using wireguard, uncomment the next line
+    # If using WireGuard, uncomment the next 3 lines
+    #sysctls:
+    #  - net.ipv4.conf.all.src_valid_mark=1
     #privileged: true
     environment:
       - VPN_PROTOCOL=${VPN_PROTOCOL}
@@ -27,6 +31,8 @@ services:
       - vpn_proxy
     ports:
       - 8118:8118
+      - 1080:1080/tcp
+      - 1080:1080/udp
     restart: always
 
 networks:
