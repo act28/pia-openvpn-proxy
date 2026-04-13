@@ -3,6 +3,13 @@
 An Alpine Linux container running Privoxy and OpenVPN/WireGuard via Private Internet
 Access
 
+> **Announcements:**
+>
+> - 2026-04-13 added socks5 tcp/udp proxy, switched ovpn to use udp + aes-256-gcm, security hardening 
+> - 2025-12-08 added linux/arm/v7 image support
+> - 2024-03-18 added linux/arm64 image support
+> - 2024-03-07 added wireguard support
+
 ## Starting the VPN Proxy
 
 ### Using `docker run`
@@ -75,9 +82,8 @@ docker-compose up -d
 
 ## Environment Variables
 
-|----------------|-------------|
 | Variable Name | Description |
-|----------------|-------------|
+|---------------|-------------|
 | `VPN_PROTOCOL` | `wireguard` or `openvpn` (Default: `openvpn`) |
 | `REGION` | Default (OpenVPN): `switzerland`. See [Wireguard](#wireguard) section below for more information. |
 | `USERNAME` | Your PIA Username |
@@ -109,6 +115,7 @@ sure to use that port number instead.
 Alternatively, you can use the ZeroOmega extension/addon as a convenience.
 
 [Proxy SwitchyOmega 3 (ZeroOmega) for Chrome](https://chromewebstore.google.com/detail/proxy-switchyomega-3-zero/pfnededegaaopdmhkdmcofjmoldfiped)
+
 [ZeroOmega--Proxy SwitchyOmega V3 for FireFox](https://addons.mozilla.org/en-US/firefox/addon/zeroomega/)
 
 ## SOCKS5 Proxy
