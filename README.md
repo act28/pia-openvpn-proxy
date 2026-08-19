@@ -32,10 +32,12 @@ docker run -d \
 -e "LOCAL_NETWORK=192.168.1.0/24" \
 -e "UID=1000" \
 -e "GID=1000" \
+-e "ENABLE_SOCKS=true" \
 -v /etc/localtime:/etc/localtime:ro \
 -v </host/path/to/config>:/config \
 -p 8118:8118 \
--p 1080:1080 \
+-p 1080:1080/udp \
+-p 1080:1080/tcp \
 docker.io/act28/pia-openvpn-proxy
 ```
 
@@ -57,10 +59,12 @@ docker run -d \
 -e "LOCAL_NETWORK=192.168.1.0/24" \
 -e "UID=1000" \
 -e "GID=1000" \
+-e "ENABLE_SOCKS=true" \
 -v /etc/localtime:/etc/localtime:ro \
 -v </host/path/to/config>:/config \
 -p 8118:8118 \
--p 1080:1080 \
+-p 1080:1080/udp \
+-p 1080:1080/tcp \
 docker.io/act28/pia-openvpn-proxy
 ```
 
@@ -92,6 +96,7 @@ docker-compose up -d
 10.1.1.0/24). |
 | `UID` | Use `id -u $USER` to find your UID |
 | `GID` | Use `id -g $USER` to find your GID. |
+| `ENABLE_SOCKS` | To disable, omit or set `false` |
 
 ## Wireguard
 

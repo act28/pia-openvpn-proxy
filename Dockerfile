@@ -1,16 +1,13 @@
-FROM alpine:3.22
-# Keeping on 3.22 for now.
-# See https://github.com/NetworkConfiguration/openresolv/issues/45#issuecomment-3706077699
-# for rationale
+FROM alpine:3.24
 
-RUN apk --no-cache add ca-certificates=~20250911-r0 \
-    && apk --no-cache add curl=~8.14 \
+RUN apk --no-cache add ca-certificates=20260611-r0 \
+    && apk --no-cache add curl=~8.21 \
     && apk --no-cache add dante-server=~1.4 \
     && apk --no-cache add iptables=~1.8 \
     && apk --no-cache add jq=~1.8 \
-    && apk --no-cache add openvpn=~2.6 \
-    && apk --no-cache add privoxy=~3.0 \
-    && apk --no-cache add runit=~2.2 \
+    && apk --no-cache add openvpn=~2.7 \
+    && apk --no-cache add privoxy=~4.0 \
+    && apk --no-cache add runit=~2.3 \
     && apk --no-cache add sudo=~1.9 \
     && apk --no-cache add unzip=~6.0 \
     && apk --no-cache add wireguard-tools=~1.0
@@ -23,6 +20,8 @@ COPY app/lib /opt/pia/lib
 COPY etc /etc
 
 RUN find /app -name "run" -exec chmod u+x {} \;
+# Neutralize resolvconf to prevent init system and signature errors in Docker
+RUN printf '#!/bin/sh\nexit 0\n' > /usr/sbin/resolvconf && chmod +x /usr/sbin/resolvconf
 
 ENV VPN_PROTOCOL="openvpn" \
     REGION="switzerland" \
@@ -30,7 +29,8 @@ ENV VPN_PROTOCOL="openvpn" \
     PASSWORD="" \
     UID="" \
     GID="" \
-    LOCAL_NETWORK=192.168.1.0/24
+    LOCAL_NETWORK=192.168.1.0/24 \
+    ENABLE_SOCKS="false"
 
 EXPOSE 1080/tcp
 EXPOSE 1080/udp

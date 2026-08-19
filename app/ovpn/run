@@ -3,8 +3,11 @@ set -e -u -o pipefail
 
 [ "$VPN_PROTOCOL" != "openvpn" ] && exit 0
 
+# Load common VPN interface detection logic
+. /opt/pia/lib/vpn-interface.sh
+
 # Exit if interface is already up.
-ip link show tun0 >/dev/null 2>&1 && exit 0
+is_vpn_up "tun0" && exit 0
 
 [ ! -d /app/ovpn/config ] && mkdir -p /app/ovpn/config
 # Download and install the latest ovpn configs
@@ -42,6 +45,7 @@ if [ -n "$USERNAME" -a -n "$PASSWORD" ]; then
   set -- "$@" '--auth-user-pass' 'auth.conf'
 else
   echo "OpenVPN credentials not set. Exiting."
+  sleep 30
   exit 1
 fi
 
@@ -75,3 +79,9 @@ set -- "$@" '--up' '/tmp/update-dns.sh'
 set -- "$@" '--down' '/tmp/update-dns.sh'
 
 openvpn "$@"
+
+# Block to prevent runit from flapping. 
+# If the interface disappears, the script exits and runit will restart the setup.
+while is_vpn_up "tun0"; do
+    sleep 60
+done

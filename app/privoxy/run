@@ -4,8 +4,10 @@ set -e -u -o pipefail
 # Load common VPN interface detection logic
 . /opt/pia/lib/vpn-interface.sh
 
-# Do not start Privoxy if VPN interface is not up
-ip link show "$VPN_INTERFACE" >/dev/null 2>&1 || exit 0
+# Wait for either 'pia' or 'tun0' to be up before starting the proxy
+until is_vpn_up "pia" || is_vpn_up "tun0"; do
+    sleep 5
+done
 
 mkdir -p /config/privoxy
 cp -Ru /etc/privoxy/* /config/privoxy/
@@ -23,4 +25,4 @@ ip route add to ${LOCAL_NETWORK} via $gw dev eth0
 
 # start
 echo "Starting Privoxy..."
-privoxy --no-daemon /config/privoxy/config
+exec privoxy --no-daemon /config/privoxy/config

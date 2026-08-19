@@ -3,8 +3,11 @@ set -e -u -o pipefail
 
 [ "$VPN_PROTOCOL" != "wireguard" ] && exit 0
 
+# Load common VPN interface detection logic
+. /opt/pia/lib/vpn-interface.sh
+
 # Exit if interface is already up.
-ip link show pia >/dev/null 2>&1 && exit 0
+is_vpn_up "pia" && exit 0
 
 echo "Removing existing token..."
 rm -f /app/wg/token
@@ -16,6 +19,7 @@ tokenResponse=$(curl -s -u "$USERNAME:$PASSWORD" \
 
 if [ $(echo "$tokenResponse" | jq -r '.status') != "OK" ]; then
     echo "ERROR: Authentication failed. PIA Username/Password is incorrect."
+    sleep 30
     exit 1
 fi
 
@@ -82,8 +86,20 @@ if [ "$(wg | grep -cm1 'interface: pia')" -eq "1" ]; then
   wg-quick down pia && echo "done"
 fi
 
+# Manually update resolv.conf to use PIA's DNS server.
+echo "Updating DNS..."
+echo "nameserver $WG_DNS" > resolv.conf
+
 # Start the WireGuard interface.
 echo "Starting the wireguard interface..."
 wg-quick up pia || exit 1
 
 echo "Wireguard connected on $WG_SERVER_IP"
+
+# Block to prevent runit from flapping. 
+# If the interface disappears, the script exits and runit will restart the setup.
+while is_vpn_up "pia"; do
+    sleep 60
+done
+
+
