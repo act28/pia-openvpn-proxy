@@ -42,7 +42,8 @@ ENV := \
 -e REGION=$(REGION) \
 -e GID=$$(id -g $$USER) \
 -e UID=$$(id -u $$USER) \
--e LOCAL_NETWORK=$(LOCAL_NETWORK)
+-e LOCAL_NETWORK=$(LOCAL_NETWORK) \
+-e ENABLE_SOCKS=$(ENABLE_SOCKS)
 
 VOLUMES := \
 -v $(CONFIG_PATH):/config \
@@ -53,10 +54,13 @@ ifeq ($(shell printf '%s\n' "$(VERSION)" "2.1.3" | sort -V | head -n1),$(VERSION
 PORTS := \
 -p $(HTTP_PORT):8118
 else
-PORTS := \
--p $(HTTP_PORT):8118 \
--p $(SOCKS_PORT):1080/tcp \
--p $(SOCKS_PORT):1080/udp
+	ifeq ($(ENABLE_SOCKS),true)
+		-p $(SOCKS_PORT):1080/tcp \
+		-p $(SOCKS_PORT):1080/udp
+	else
+		PORTS := \
+		-p $(HTTP_PORT):8118
+	endif
 endif
 
 .PHONY: shell build builder start stop rm release test
