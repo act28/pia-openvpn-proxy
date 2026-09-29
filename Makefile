@@ -88,6 +88,11 @@ builder:
 release:
 	@docker buildx build --builder=container --platform=linux/amd64,linux/arm64,linux/arm/v7 -t $(DOCKER_REPO):$(VERSION) -t $(DOCKER_REPO):latest --push .
 
+push:
+	@docker tag $(DOCKER_REPO):$(VERSION) $(DOCKER_REPO):latest
+	@docker push $(DOCKER_REPO):$(VERSION)
+	@docker push $(DOCKER_REPO):latest
+
 test::
 	# Test IP
 	docker run --rm --network=container:$(CONTAINER_NAME)-$(CONTAINER_INSTANCE) docker.io/appropriate/curl -s ipecho.net/plain

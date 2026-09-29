@@ -3,8 +3,9 @@
 An Alpine Linux container running Privoxy and OpenVPN/WireGuard via Private Internet
 Access
 
-> **Announcements:**
+> **CHANGELOG:**
 >
+> - 2026-09-29 update servers list to v7, pinned package dependencies
 > - 2026-04-13 added socks5 tcp/udp proxy, switched ovpn to use udp + aes-256-gcm, security hardening 
 > - 2025-12-08 added linux/arm/v7 image support
 > - 2024-03-18 added linux/arm64 image support
@@ -104,7 +105,7 @@ PIA's wireguard uses a JSON API request over HTTPS to configure and setup the
 tunnel connection. You will have to search through the returned JSON
 data to find the `id` key of your preferred region.
 
-You can find the current region list [here](https://serverlist.piaservers.net/vpninfo/servers/v6).
+You can find the current region list [here](https://serverlist.piaservers.net/vpninfo/servers/v7).
 
 The open-source [PIA manual-connection](https://github.com/pia-foss/manual-connections)
 script uses a latency check to determine the "best" region, which may not be

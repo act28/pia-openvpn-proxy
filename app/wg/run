@@ -17,7 +17,7 @@ echo "Getting a token..."
 tokenResponse=$(curl -s -u "$USERNAME:$PASSWORD" \
 "https://www.privateinternetaccess.com/gtoken/generateToken")
 
-if [ $(echo "$tokenResponse" | jq -r '.status') != "OK" ]; then
+if [ "$(echo "$tokenResponse" | jq -r '.status')" != "OK" ]; then
     echo "ERROR: Authentication failed. PIA Username/Password is incorrect."
     sleep 30
     exit 1
@@ -28,8 +28,8 @@ echo "$token" > /app/wg/token
 chmod 600 /app/wg/token
 
 # Get region data
-echo "Fetching server info..."
-allRegions=$(curl -s https://serverlist.piaservers.net/vpninfo/servers/v6 | head -1)
+echo "Using local server info..."
+allRegions=$(cat /app/wg/servers-v7.json)
 
 # Get the selected region
 echo "Getting configured region data..."
@@ -56,7 +56,7 @@ wireguard_json="$(curl -s -G \
   "https://${WG_HOSTNAME}:1337/addKey")"
 
 # Check if the API returned OK and stop this script if it didn't.
-if [ $(echo "$wireguard_json" | jq -r '.status') != "OK" ]; then
+if [ "$(echo "$wireguard_json" | jq -r '.status')" != "OK" ]; then
   >&2 echo "ERROR: Server did not return OK."
   exit 1
 fi
