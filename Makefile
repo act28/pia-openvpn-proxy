@@ -50,17 +50,13 @@ VOLUMES := \
 -v /etc/localtime:/etc/localtime:ro
 
 
+PORTS := -p $(HTTP_PORT):8118
 ifeq ($(shell printf '%s\n' "$(VERSION)" "2.1.3" | sort -V | head -n1),$(VERSION))
-PORTS := \
--p $(HTTP_PORT):8118
+    # Version <= 2.1.3: Keep default PORTS
 else
-	ifeq ($(ENABLE_SOCKS),true)
-		-p $(SOCKS_PORT):1080/tcp \
-		-p $(SOCKS_PORT):1080/udp
-	else
-		PORTS := \
-		-p $(HTTP_PORT):8118
-	endif
+    ifeq ($(ENABLE_SOCKS),true)
+        PORTS := -p $(SOCKS_PORT):1080/tcp -p $(SOCKS_PORT):1080/udp
+    endif
 endif
 
 .PHONY: shell build builder start stop rm release test
