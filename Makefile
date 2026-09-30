@@ -1,6 +1,8 @@
 DOCKER_REPO := docker.io/act28/pia-openvpn-proxy
 
--include make_env
+# Override default env file if specified, e.g. `make start ENV_FILE=custom.env`
+ENV_FILE ?= .env
+-include $(ENV_FILE)
 
 CONTAINER_NAME ?= vpn_proxy
 CONTAINER_INSTANCE ?= default
@@ -9,8 +11,8 @@ REGION ?= switzerland
 CONFIG_PATH ?= ./config
 HTTP_PORT ?= 8118
 SOCKS_PORT ?= 1080
-LOCAL_NETWORK ?= 10.1.1.0/24
-VERSION ?= latest
+LOCAL_NETWORK ?= 192.168.1.0/24
+VERSION ?= $(shell cat VERSION)
 
 DNS ?= \
 --dns=209.222.18.218 --dns=209.222.18.222 --dns=9.9.9.9 --dns=1.1.1.1
@@ -36,8 +38,8 @@ OPTS := $(OVPN_OPTS)
 endif
 
 ENV := \
--e USERNAME=$(USERNAME) \
--e PASSWORD=$(PASSWORD) \
+-e USERNAME=$(PIA_USERNAME) \
+-e PASSWORD=$(PIA_PASSWORD) \
 -e VPN_PROTOCOL=$(VPN_PROTOCOL) \
 -e REGION=$(REGION) \
 -e GID=$$(id -g $$USER) \
@@ -59,7 +61,7 @@ else
     endif
 endif
 
-.PHONY: shell build builder start stop rm release test
+.PHONY: shell build builder start stop rm release test test-all
 
 .DEFAULT_GOAL := start
 
@@ -96,3 +98,21 @@ test::
 	docker exec $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) cat /etc/resolv.conf
 	# Test DNS resolution goes through VPN
 	docker exec $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) nslookup google.com
+	# Audit logs for errors
+	@echo "Checking logs for errors..."
+	@docker logs $(CONTAINER_NAME)-$(CONTAINER_INSTANCE) 2>&1 | grep -Ei "error|failed|invalid|authentication failed" && { echo "ERROR: Critical issues found in logs"; exit 1; } || echo "Logs clean"
+
+test-all:
+	@echo "Running full test suite for both protocols..."
+	@make build
+	@for proto in openvpn wireguard; do \
+		echo "Testing $$proto..."; \
+		VPN_PROTOCOL=$$proto make rm; \
+		VPN_PROTOCOL=$$proto make start; \
+		sleep 15; \
+		if ! VPN_PROTOCOL=$$proto make test; then \
+			echo "ERROR: Tests failed for $$proto. Aborting."; \
+			exit 1; \
+		fi; \
+		VPN_PROTOCOL=$$proto make rm; \
+	done
