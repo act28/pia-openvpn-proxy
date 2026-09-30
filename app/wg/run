@@ -17,8 +17,17 @@ echo "Getting a token..."
 tokenResponse=$(curl -s -u "$USERNAME:$PASSWORD" \
 "https://www.privateinternetaccess.com/gtoken/generateToken")
 
+# Check if response is valid JSON
+if ! echo "$tokenResponse" | jq empty >/dev/null 2>&1; then
+    echo "ERROR: Received non-JSON response from PIA API."
+    echo "Response: $tokenResponse"
+    sleep 30
+    exit 1
+fi
+
 if [ "$(echo "$tokenResponse" | jq -r '.status')" != "OK" ]; then
     echo "ERROR: Authentication failed. PIA Username/Password is incorrect."
+    echo "API Response: $(echo "$tokenResponse" | jq -r '.status')"
     sleep 30
     exit 1
 fi
@@ -35,7 +44,7 @@ allRegions=$(cat /app/wg/servers-v7.json)
 echo "Getting configured region data..."
 regionData="$(echo "$allRegions" | jq --arg REGION_ID "$REGION" -r '.regions[] | select(.id==$REGION_ID)')"
 if [ -z "$regionData" ]; then
-    echo "REGION_ID `$REGION` is not valid."
+    echo "ERROR: REGION_ID `$REGION` is not valid."
     exit 1
 fi
 
